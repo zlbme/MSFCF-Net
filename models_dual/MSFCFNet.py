@@ -5,13 +5,12 @@ import torch.nn as nn
 import math
 
 
-# ######################################################################################################################
-#                                                 Model Components
-# ######################################################################################################################
+# ============================================================================================
+#                                    Model Components
+# ============================================================================================
 
-# ======================================================================================================================
-#                                                  Basic Modules
-# ======================================================================================================================
+# ------------------------------------ Basic Modules -----------------------------------------
+
 
 class FCLeaky(nn.Module):
     def __init__(self, in_features, out_features):
@@ -101,13 +100,12 @@ class TconvBNLeaky(nn.Module):
     def forward(self, x):
         return self.leaky_relu(self.bn(self.tconv(x)))
 
+# ---------------------------------- Attention Modules ---------------------------------
 
-# ======================================================================================================================
-#                                               Attention Modules
-# ======================================================================================================================
 # The channel attention and spatial attention mechanism below is proposed in the paper:
 # "Woo, S., Park, J., Lee, J.Y. and So Kweon, I., 2018. Cbam: Convolutional block attention module. In Proceedings of
 # the European conference on computer vision (ECCV) (pp. 3-19)."
+
 
 class ChannelAttention(nn.Module):
     def __init__(self, in_channels, ratio=16):
@@ -147,9 +145,8 @@ class SpatialAttention(nn.Module):
         return self.sigmoid(x)
 
 
-# ======================================================================================================================
-#                                              Residual  Modules
-# ======================================================================================================================
+# ---------------------------------- Residual  Modules -------------------------------------
+
 
 class ResUnit(nn.Module):
     # Residual V2 unit.
@@ -259,10 +256,9 @@ class ResBlockTwice(nn.Module):
     def forward(self, x):
         return self.block(self.layer(x))
 
+# ----------------------------------  Multi modal Feature Fusion Modules ------------------------------------
 
-# ======================================================================================================================
-#                                       Multi modal Feature Fusion Modules
-# ======================================================================================================================
+
 class FeatureFusionUnit(nn.Module):
     def __init__(self, in_channels, attention_type, fusion_type, add_bn):
         """
@@ -359,9 +355,9 @@ class FeatureFusionBlock(nn.Module):
         return self.block2(self.block1(x1, x2))
 
 
-# ######################################################################################################################
-#                                                  Complete Model
-# ######################################################################################################################
+# ============================================================================================
+#                                     Complete Model
+# ============================================================================================
 
 class MSFCFNet(nn.Module):
     """
@@ -374,9 +370,9 @@ class MSFCFNet(nn.Module):
 
     def __init__(self, v_type, msk_channel, add_bn):
         super().__init__()
-        # ---------------------------------------------------------
-        #                    Voltage Path
-        # ---------------------------------------------------------
+     
+        # ----------------  Voltage Path  -------------------
+       
         # Prior Layer
         if v_type == 'vector':
             if add_bn is False:
@@ -395,9 +391,9 @@ class MSFCFNet(nn.Module):
         self.vresblock4 = ResBlockHalf(32, 64, half_type='convolution', num_units=7, add_bn=add_bn)    # 64 x 8 x 8
         self.vresblock5 = ResBlockHalf(64, 128, half_type='convolution', num_units=7, add_bn=add_bn)   # 128 x 4 x 4
         self.vresblock6 = ResBlockHalf(128, 256, half_type='convolution', num_units=5, add_bn=add_bn)  # 256 x 2 x 2
-        # ---------------------------------------------------------
-        #                       Mask Path
-        # ---------------------------------------------------------1
+        
+        # -------------------  Mask Path  --------------------
+       
         if msk_channel == 1:
             self.mresblock1 = ResBlockCC(1, 8, num_units=3, add_bn=add_bn)  # 8 x 64 x 64
         elif msk_channel == 2:
@@ -408,18 +404,18 @@ class MSFCFNet(nn.Module):
         self.mresblock4 = ResBlockHalf(32, 64, half_type='convolution', num_units=7, add_bn=add_bn)    # 64 x 8 x 8
         self.mresblock5 = ResBlockHalf(64, 128, half_type='convolution', num_units=7, add_bn=add_bn)   # 128 x 4 x 4
         self.mresblock6 = ResBlockHalf(128, 256, half_type='convolution', num_units=5, add_bn=add_bn)  # 256 x 2 x 2
-        # ---------------------------------------------------------
-        #              Step 1: Dual Model Feature Fusion
-        # ---------------------------------------------------------
+        
+        # -------------------  Step 1: Dual Model Feature Fusion  -------------------
+        
         self.s1FF64 = FeatureFusionBlock(8, attention_type='channel_spatial', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF32 = FeatureFusionBlock(16, attention_type='channel_spatial', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF16 = FeatureFusionBlock(32, attention_type='channel_spatial', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF8 = FeatureFusionBlock(64, attention_type='channel', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF4 = FeatureFusionBlock(128, attention_type='channel', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF2 = FeatureFusionBlock(256, attention_type='channel', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
-        # ---------------------------------------------------------
-        #              Step 2: Multi-scale Feature Fusion
-        # ---------------------------------------------------------
+      
+        # -------------------  Step 2: Multi-scale Feature Fusion  -------------------
+        
         if add_bn is False:
             self.s2FF64_1 = TconvLeaky(16, 8, kernel_size=2, stride=2)
             self.s2FF32_1 = TconvLeaky(32, 16, kernel_size=2, stride=2)
@@ -438,13 +434,15 @@ class MSFCFNet(nn.Module):
         self.s2FF16_2 = ResBlock(32, num_units=3, add_bn=add_bn)
         self.s2FF8_2 = ResBlock(64, num_units=3, add_bn=add_bn)
         self.s2FF4_2 = ResBlock(128, num_units=3, add_bn=add_bn)
-        # ---------------------------------------------------------
-        #                         Output
-        # ---------------------------------------------------------
+        
+        # ---------------------  Output  --------------------
+       
         self.outconv = nn.Conv2d(8, 1, kernel_size=3, padding=1)
 
     def forward(self, inV, inMsk):
-        # ============================= Voltage Path ==============================
+        
+       # --------------------- Voltage Path -----------------------
+    
         xv = self.pri_fc3(self.pri_fc2(self.pri_fc1(inV)))
         # reshape to  1 x 64 x 64
         xv = xv.view(-1, 1, 64, 64)
@@ -455,14 +453,18 @@ class MSFCFNet(nn.Module):
         xv8 = self.vresblock4(xv16)
         xv4 = self.vresblock5(xv8)
         xv2 = self.vresblock6(xv4)
-        # =============================== Mask Path ===============================
+        
+        # --------------------- Mask Path -----------------------
+        
         xm64 = self.mresblock1(inMsk)
         xm32 = self.mresblock2(xm64)
         xm16 = self.mresblock3(xm32)
         xm8 = self.mresblock4(xm16)
         xm4 = self.mresblock5(xm8)
         xm2 = self.mresblock6(xm4)
-        # =============== Feature Fusion to Generate Output Image ==================
+        
+        # --------------- Feature Fusion to Generate Output Image -------------
+        
         xf = self.s2FF4_2(self.s1FF4(xv4, xm4) + self.s2FF4_1(self.s1FF2(xv2, xm2)))
         xf = self.s2FF8_2(self.s1FF8(xv8, xm8) + self.s2FF8_1(xf))
         xf = self.s2FF16_2(self.s1FF16(xv16, xm16) + self.s2FF16_1(xf))
