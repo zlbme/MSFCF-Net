@@ -1,22 +1,19 @@
 """
-Implementation of Networks "FC-UNet" in paper:
+Implementation of the Network "FC-UNet" in the paper:
+   
+   "Chen, Z., Yang, Y., Jia, J. and Bagnaninchi, P., 2020, May. Deep Learning Based Cell Imaging with Electrical Impedance
+   Tomography. In 2020 IEEE International Instrumentation and Measurement Technology Conference (I2MTC) (pp. 1-6). IEEE."
 
-Chen, Z., Yang, Y., Jia, J. and Bagnaninchi, P., 2020, May. Deep Learning Based Cell Imaging with Electrical Impedance
-Tomography. In 2020 IEEE International Instrumentation and Measurement Technology Conference (I2MTC) (pp. 1-6). IEEE.
+There is a difference between this implementation and the model in above paper. It is that the output layer is not activated 
+as we need to conduct quantitative image reconstruction (regression).
 
-Note: The only difference is that the output layer is not activated as we need to conduct quantitative image
-      reconstruction.
-
-Author: LIU Zhe
-Date: 2020
+@author: LIU Zhe
 """
 import torch
 import torch.nn as nn
 
 
-# ######################################################################################################################
-#                                             Components of Model
-# ######################################################################################################################
+# ------------------------  Model Components  -----------------------------
 
 class FCReLU(nn.Module):
     def __init__(self, in_features, out_features):
@@ -64,9 +61,7 @@ class TconvReLU(nn.Module):
         return self.relu(self.tconv(x))
 
 
-# ######################################################################################################################
-#                                              The Full Model
-# ######################################################################################################################
+# ------------------------  Complete Model  ------------------------
 
 class FCUNet(nn.Module):
     def __init__(self):
@@ -123,11 +118,14 @@ class FCUNet(nn.Module):
 
 
 if __name__ == '__main__':
-
+    
+    # data
     x = torch.empty(2, 104)
-
+    
+    # model
     model = FCUNet()
-
+    
+    # forward
     y = model(x)
 
     # results
