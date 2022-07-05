@@ -106,8 +106,8 @@ class TconvBNLeaky(nn.Module):
 #                                               Attention Modules
 # ======================================================================================================================
 # The channel attention and spatial attention mechanism below is proposed in the paper:
-# Woo, S., Park, J., Lee, J.Y. and So Kweon, I., 2018. Cbam: Convolutional block attention module. In Proceedings of
-# the European conference on computer vision (ECCV) (pp. 3-19).
+# "Woo, S., Park, J., Lee, J.Y. and So Kweon, I., 2018. Cbam: Convolutional block attention module. In Proceedings of
+# the European conference on computer vision (ECCV) (pp. 3-19)."
 
 class ChannelAttention(nn.Module):
     def __init__(self, in_channels, ratio=16):
