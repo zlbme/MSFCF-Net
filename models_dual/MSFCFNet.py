@@ -1,4 +1,4 @@
-# Models for Dual-modal EIT Reconstruction
+# Multi-Scale Feature Cross Fusion Net (MSFCF-Net)
 # @author: LIU Zhe
 import torch
 import torch.nn as nn
@@ -360,14 +360,14 @@ class FeatureFusionBlock(nn.Module):
 
 
 # ######################################################################################################################
-#                                                  Full Models
+#                                                  Complete Model
 # ######################################################################################################################
 
 class MSFCFNet(nn.Module):
     """
-    Multi-Scale Feature Cross Fusion Net (MSFCF-Net)  <=====>  [ The Model in My TMI Paper ]
+    Multi-Scale Feature Cross Fusion Net (MSFCF-Net)
 
-    Model instantiation in my published paper:
+    Model instantiation in the published paper:
 
               model = MSFCFNet(v_type='vector', msk_channel=1, add_bn=False)
     """
@@ -474,14 +474,15 @@ class MSFCFNet(nn.Module):
 
 
 if __name__ == '__main__':
-
+     
+    # data
     in_v = torch.empty(3, 104)
     in_msk = torch.empty(3, 1, 64, 64)
 
     # model
     model = MSFCFNet(v_type='vector', msk_channel=1, add_bn=False)
 
-    # out_img = model(in_v, in_msk)
+    # forward
     out_img = model(in_v, in_msk)
 
     # results
