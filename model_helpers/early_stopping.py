@@ -8,7 +8,7 @@ class EarlyStopping:
     """
     def __init__(self, log_path, patience=7, verbose=False, delta=0):
         """
-        log_path - absolute path, where the model (or parameter) is stored.
+        log_path - absolute path, where saving the model parameters.
         patience - int, how long to wait after last improved validation loss. Default: 7
         verbose  - bool, if True, prints a message for each validation loss improvement. Default: False
         delta    - float, minimum change in the monitored quantity to qualify as an improvement. Default: 0
