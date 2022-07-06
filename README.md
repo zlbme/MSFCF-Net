@@ -1,2 +1,2 @@
-# MSFCF-Net
-Multi-Scale Feature Cross Fusion Network
+# Multi-Scale Feature Cross Fusion Network (MSFCF-Net)
+
