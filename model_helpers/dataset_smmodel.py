@@ -1,5 +1,5 @@
 '''
-Dataset class for single-modal deep learning model
+Dataset class for single-modal deep learning model 
 @author: LIU Zhe
 '''
 from torch.utils.data import Dataset, DataLoader
