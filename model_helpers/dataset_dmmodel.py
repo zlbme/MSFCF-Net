@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 class DatasetDualVanilla(Dataset):
     """
-    Vanilla version of dual-modal dataset
+    Vanilla version of dataset for dual-modal imaging 
     """
     def __init__(self, v_path, msk_path, img_path):
 
