@@ -405,7 +405,7 @@ class MSFCFNet(nn.Module):
         self.mresblock5 = ResBlockHalf(64, 128, half_type='convolution', num_units=7, add_bn=add_bn)   # 128 x 4 x 4
         self.mresblock6 = ResBlockHalf(128, 256, half_type='convolution', num_units=5, add_bn=add_bn)  # 256 x 2 x 2
         
-        # -------------------  Step 1: Dual Model Feature Fusion  -------------------
+        # -------------------  Step 1: Dual-modal Feature Fusion  -------------------
         
         self.s1FF64 = FeatureFusionBlock(8, attention_type='channel_spatial', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
         self.s1FF32 = FeatureFusionBlock(16, attention_type='channel_spatial', fusion_type='concatenation', num_resunits=3, add_bn=add_bn)
