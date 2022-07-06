@@ -1,5 +1,5 @@
 '''
-Dataset class for single-modal EIT image reconstruction
+Dataset class for single-modal deep learning model
 @author: LIU Zhe
 '''
 from torch.utils.data import Dataset, DataLoader
@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 class DatasetSingleVanilla(Dataset):
     """
-    Vanilla version of dataset for single-modal imaging 
+    Vanilla version of dataset for single-modal deep learning model
     """
     def __init__(self, v_path, img_path):
         super().__init__()
