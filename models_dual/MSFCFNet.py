@@ -444,9 +444,10 @@ class MSFCFNet(nn.Module):
        # --------------------- Voltage Path -----------------------
     
         xv = self.pri_fc3(self.pri_fc2(self.pri_fc1(inV)))
+        
         # reshape to  1 x 64 x 64
         xv = xv.view(-1, 1, 64, 64)
-        #
+        
         xv64 = self.vresblock1(xv)
         xv32 = self.vresblock2(xv64)
         xv16 = self.vresblock3(xv32)
