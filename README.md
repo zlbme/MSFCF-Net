@@ -8,4 +8,4 @@ in the paper:
 The position of the MSFCF-Net in the dual-modal imaging framework
 -----------------------------------------------------------------
 
-<img src="./pictures/imaging_framework.png" width="500px"/>
+<img src="./pictures/imaging_framework.png" width="1000px"/>
