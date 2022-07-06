@@ -1,24 +1,24 @@
 """
-Single-modal version of MSFCF-Net (S-MSFCF-Net)
+Single-modal version of the MSFCF-Net: S-MSFCF-Net
 
-S-MSFCF-Net removes the BN-M and DMFF modules while the MSFF modules will fuse different
-scales of feature maps from BN-V itself like MSFCF-Net does.
+S-MSFCF-Net removes the backbone network for mask input (BN-M) and 
+dual-modal feature fusion modules (DMFF) while the multi-scale feature fusion 
+modules (MSFF) will fuse different scales of feature maps from the backbone
+network for voltage input (BN-V) like MSFCF-Net does.
 
-Author: Zhe Liu
-Date: 2020
+@author: LIU Zhe
 """
 import torch
 import torch.nn as nn
 import math
 
 
-# ######################################################################################################################
-#                                             Components of Model
-# ######################################################################################################################
+# =====================================================================================
+#                                  Model Components
+# =====================================================================================
 
-# ======================================================================================================================
-#                                                  Basic Modules
-# ======================================================================================================================
+# --------------------------------  Basic Modules  ------------------------------------
+
 
 class FCLeaky(nn.Module):
     def __init__(self, in_features, out_features):
@@ -109,9 +109,8 @@ class TconvBNLeaky(nn.Module):
         return self.leaky_relu(self.bn(self.tconv(x)))
 
 
-# ======================================================================================================================
-#                                                Residual Modules
-# ======================================================================================================================
+# --------------------------------  Residual Modules  --------------------------------
+
 
 class ResUnit(nn.Module):
     # Residual V2 unit.
@@ -222,9 +221,9 @@ class ResBlockTwice(nn.Module):
         return self.block(self.layer(x))
 
 
-# ######################################################################################################################
-#                                               The Full Model
-# ######################################################################################################################
+# =====================================================================================
+#                                  Complete Model
+# =====================================================================================
 
 
 class SMSFCFNet(nn.Module):
@@ -237,11 +236,13 @@ class SMSFCFNet(nn.Module):
         ----------
             shape: N x 1 X 64 X 64
 
-    Note: N is the number of data points
+    Note: N is the number of data samples
     """
     def __init__(self, add_bn):
         super().__init__()
-        # Feature Extraction
+        
+        # ---------  Feature Extraction  -----------
+        
         # prior layer
         if add_bn is False:
             self.pri_fc1 = FCLeaky(104, 1 * 16 * 64)
@@ -259,7 +260,8 @@ class SMSFCFNet(nn.Module):
         self.vresblock5 = ResBlockHalf(64, 128, half_type='convolution', num_units=7, add_bn=add_bn)   # 128 x 4 x 4
         self.vresblock6 = ResBlockHalf(128, 256, half_type='convolution', num_units=5, add_bn=add_bn)  # 256 x 2 x 2
 
-        # Feature Fusion
+        # ----------  Feature Fusion  -----------
+        
         if add_bn is False:
             self.s2FF64_1 = TconvLeaky(16, 8, kernel_size=2, stride=2)
             self.s2FF32_1 = TconvLeaky(32, 16, kernel_size=2, stride=2)
@@ -279,7 +281,8 @@ class SMSFCFNet(nn.Module):
         self.s2FF8_2 = ResBlock(64, num_units=3, add_bn=add_bn)
         self.s2FF4_2 = ResBlock(128, num_units=3, add_bn=add_bn)
 
-        # Output
+        # -------------  Output  -------------
+        
         self.outconv = nn.Conv2d(8, 1, kernel_size=3, padding=1)
 
     def forward(self, in_v):
@@ -310,11 +313,14 @@ class SMSFCFNet(nn.Module):
 
 
 if __name__ == '__main__':
-
+    
+    # data
     in_v = torch.empty(3, 104)
-
+    
+    # model
     model = SMSFCFNet(add_bn=False)
-
+    
+    # forward
     out_img = model(in_v)
 
     # results
