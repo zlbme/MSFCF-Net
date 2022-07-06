@@ -256,7 +256,7 @@ class ResBlockTwice(nn.Module):
     def forward(self, x):
         return self.block(self.layer(x))
 
-# ----------------------------------  Multi modal Feature Fusion Modules ------------------------------------
+# ----------------------------------  Dual-modal Feature Fusion Modules ------------------------------------
 
 
 class FeatureFusionUnit(nn.Module):
