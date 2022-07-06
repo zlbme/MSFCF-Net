@@ -1,5 +1,5 @@
 """
-Dataset class for dual-modal EIT image reconstruction
+Dataset class for dual-modal deep learning model
 @author: LIU Zhe
 """
 from torch.utils.data import Dataset, DataLoader
@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 class DatasetDualVanilla(Dataset):
     """
-    Vanilla version of dataset for dual-modal imaging 
+    Vanilla version of dataset for dual-modal deep learning model
     """
     def __init__(self, v_path, msk_path, img_path):
 
