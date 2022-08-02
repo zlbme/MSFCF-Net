@@ -92,6 +92,7 @@ class FCUNet(nn.Module):
         self.R_64 = TwoConvReLU(192, 64)
 
         # Output
+        # Without activation fuction !
         self.outconv = nn.Conv2d(64, 1, kernel_size=1)
 
     def forward(self, x):
